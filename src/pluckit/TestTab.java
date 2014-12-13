@@ -6,8 +6,10 @@
 package pluckit;
 
 import java.awt.List;
+import java.util.ArrayList;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -19,6 +21,7 @@ import javafx.scene.shape.Rectangle;
  */
 public class TestTab {
     FlowPane tab;
+    ArrayList<WritableImage> images;
     
     public FlowPane getTab(){
         tab = new FlowPane();
@@ -28,16 +31,27 @@ public class TestTab {
     }
     
     public void getChild(int chord[]){
-        tab.getChildren().addAll(new StackPane(new Rectangle(220, 420, Color.CORNFLOWERBLUE)
+          if (images == null)
+            images = new ArrayList<WritableImage>();
+        
+        StackPane newPane = new StackPane(new Rectangle(220, 420, Color.CORNFLOWERBLUE)
                 ,new ImageView(new Image("/tab.png")),getChord(-100,chord[0]),getChord(-60,chord[1]),
-                getChord(-20,chord[2]),getChord(20,chord[3]),getChord(60,chord[4]),getChord(100,chord[5])));
+                getChord(-20,chord[2]),getChord(20,chord[3]),getChord(60,chord[4]),getChord(100,chord[5]));  
+        
+        tab.getChildren().addAll(newPane);
         tab.setHgap(20);
         tab.setVgap(20);
+        
+        
+        images.add(newPane.snapshot(null, null));
+
     }
     
     
     
     public ImageView getChord(int posX, int posY){
+      
+        
         ImageView image = new ImageView(getNote());
         
         int pos = 0;
@@ -63,7 +77,9 @@ public class TestTab {
         
         image.setTranslateX(posX);
         image.setTranslateY(pos);
+                
         return image;
+        
     }
     
     public Image getNote(){
@@ -71,4 +87,14 @@ public class TestTab {
         
         return note;
     }
+    
+    public WritableImage getImage(int pos) 
+    {
+        return images.get(pos);
+    }
+    
+    public int getImageCount() {
+        return images.size();
+    }
+            
 }
