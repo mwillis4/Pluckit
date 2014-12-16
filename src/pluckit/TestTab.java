@@ -5,15 +5,12 @@
  */
 package pluckit;
 
-import java.awt.List;
 import java.util.ArrayList;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 /**
  *
@@ -33,10 +30,9 @@ public class TestTab {
     public void getChild(int chord[]){
           if (images == null)
             images = new ArrayList<WritableImage>();
+        ImageView view = new ImageView(new Image("/tab.png"));
         
-        StackPane newPane = new StackPane(new Rectangle(220, 420, Color.CORNFLOWERBLUE)
-                ,new ImageView(new Image("/tab.png")),getChord(-100,chord[0]),getChord(-60,chord[1]),
-                getChord(-20,chord[2]),getChord(20,chord[3]),getChord(60,chord[4]),getChord(100,chord[5]));  
+        StackPane newPane = new StackPane(view,getChord(-100,chord[0]),getChord(-60,chord[1]),getChord(-20,chord[2]),getChord(20,chord[3]),getChord(60,chord[4]),getChord(100,chord[5]));  
         
         tab.getChildren().addAll(newPane);
         tab.setHgap(20);
@@ -59,17 +55,17 @@ public class TestTab {
         switch(posY){
             case 0: image = new ImageView();
                 break;
-            case 1: pos = -200;
+            case 1: pos = -180;
                  break;
-            case 2: pos = -160;
+            case 2: pos = -140;
                  break;
-            case 3: pos = -120;
+            case 3: pos = -100;
                  break;
-            case 4: pos = -80;
+            case 4: pos = -60;
                  break;
-            case 5: pos = -40;
+            case 5: pos = -20;
                  break;
-            case 6: pos = 0;    
+            case 6: pos = 20;    
                  break;
                 
                 
@@ -97,4 +93,8 @@ public class TestTab {
         return images.size();
     }
             
+    public ArrayList<WritableImage> getImages()
+    {
+        return images;
+    }
 }
