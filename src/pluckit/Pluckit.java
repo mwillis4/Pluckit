@@ -19,10 +19,12 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
@@ -47,11 +49,13 @@ import org.xml.sax.SAXException;
  * @author Douglas
  */
 public class Pluckit extends Application {
-
+    Stage theStage = new Stage();
+    
     @Override
     public void start(Stage primaryStage) throws ParserConfigurationException, SAXException, IOException {
-
-        primaryStage.setTitle("Anything");
+        
+        setStage(primaryStage);
+        primaryStage.setTitle("Pick It Version 1.0.0.0");
         primaryStage.setScene(wholeArea());
         primaryStage.show();
     }
@@ -60,10 +64,11 @@ public class Pluckit extends Application {
         final TestTab tab = new TestTab();
         ScrollPane holderArea = new ScrollPane();
         ArrayList<Chord> allChords = new ArrayList<Chord>();
+        ArrayList<Chord> savedChords = new ArrayList<Chord>();
         Database data = new Database();
         ArrayList<Sectional> sectionalList = new ArrayList<Sectional>();
-        data.setSectionalAddress("C:\\Users\\MorganWillis\\Documents\\NetBeansProjects\\pluckit\\Chords.xml");
-
+        File chordsFile = new File("Chords.xml");
+        data.setSectionalAddress(chordsFile.getAbsolutePath());
         sectionalList = data.loadSectional();
         
           FlowPane leftSideButtons = new FlowPane();
@@ -72,6 +77,7 @@ public class Pluckit extends Application {
             System.out.println(sectionalList1.getName());
             for (Chord chord : sectionalList1.getChords()) {
                 Button button = new Button(chord.getName());
+                button.setMinSize(70, 70);
                 leftSideButtons.getChildren().add(button);
                 int[] chords = new int[6];
                 Character number = chord.getFingers().charAt(0);
@@ -144,7 +150,7 @@ public class Pluckit extends Application {
         MenuItem exit = new MenuItem("Exit");
 
         MenuItem loadChord = new MenuItem("Load Chord");
-
+        MenuItem newChord = new MenuItem("New Chord");
         load.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -197,32 +203,6 @@ public class Pluckit extends Application {
 
             }
         });
-
-        export.setOnAction((new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-
-                pluckit.PrepArea newPA = new pluckit.PrepArea();
-                String exportAddress;
-
-                for (int i = 0; i < tab.getImageCount(); i++) {
-                    exportAddress = "//textPic";
-                    exportAddress = exportAddress + i + ".png";
-
-                    System.out.println(exportAddress);
-                    try {
-                        newPA.exportToWord(exportAddress, tab.getImages());
-                    } catch (IOException ex) {
-                        Logger.getLogger(Pluckit.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (Docx4JException ex) {
-                        Logger.getLogger(Pluckit.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (Exception ex) {
-                        Logger.getLogger(Pluckit.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-
-        }));
         
             save.setOnAction ( 
                 new EventHandler<ActionEvent>() {
@@ -239,7 +219,7 @@ public class Pluckit extends Application {
                     FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
                     fileChooser.getExtensionFilters().add(filter);
                     File file = fileChooser.showSaveDialog(chooser);
-                    String fileName = file.getName();
+                    String fileName = file.toString();
                     saveXML.saveSong(fileName);
 
                 }
@@ -282,6 +262,7 @@ public class Pluckit extends Application {
                         System.out.println(sectionalList1.getName());
                         for (Chord chord : sectionalList1.getChords()) {
                             Button button = new Button(chord.getName());
+                            button.setMinSize(70, 70);
                             leftSideButtons.getChildren().add(button);
                             int[] chords = new int[6];
                             Character number = chord.getFingers().charAt(0);
@@ -318,21 +299,94 @@ public class Pluckit extends Application {
             }
 
             );
+            
+            /**********************************
+        * This is for creating a new chord
+        ***********************************/
+        newChord.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                VBox vbox1 = new VBox();
+                Stage chordMaker = new Stage();
+                chordMaker.setTitle("New Chord");
+               HBox chordfinger = new HBox();
+               HBox chordname = new HBox();
+               Label chordName = new Label("Chord Name");
+               Label finger1 = new Label("Finger Position");
+                TextField fingers = new TextField ();
+                TextField name = new TextField ();
+                Button getFingers = new Button("Get Chord");
+                chordfinger.getChildren().addAll(finger1,fingers);
+                chordname.getChildren().addAll(chordName,name);
+                vbox1.getChildren().addAll(chordname,chordfinger,getFingers);
+                Scene chordScene = new Scene(vbox1,600,300);
+                chordMaker.setScene(chordScene);
+                chordMaker.show();
+               
+                getFingers.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent t) {
+                       
+                        Chord chord = new Chord();
+                chord.setFingers( fingers.getText());
+                chord.setName(name.getText());
+                   Button button = new Button(name.getText());
+                button.setMinSize(70, 70);
+                leftSideButtons.getChildren().add(button);
+                int[] chords = new int[6];
+                Character number = chord.getFingers().charAt(0);
+                String num = number.toString();
+                chords[0] = Integer.parseInt(num);
+                number = chord.getFingers().charAt(1);
+                num = number.toString();
+                chords[1] = Integer.parseInt(num);
+                number = chord.getFingers().charAt(2);
+                num = number.toString();
+                chords[2] = Integer.parseInt(num);
+                number = chord.getFingers().charAt(3);
+                num = number.toString();
+                chords[3] = Integer.parseInt(num);
+                number = chord.getFingers().charAt(4);
+                num = number.toString();
+                chords[4] = Integer.parseInt(num);
+                number = chord.getFingers().charAt(5);
+                num = number.toString();
+                chords[5] = Integer.parseInt(num);
+                savedChords.add(chord);
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent t) {
+
+                        tab.getChild(chords);
+                        allChords.add(chord);
+                    }
+                });
+                        
+                    }
+                });
+                
+            }
+            
+        });
 
             export.setOnAction ( 
                 (new EventHandler<ActionEvent>() {
             @Override
                 public void handle
-                (ActionEvent event
-                
-                    ) {
+                (ActionEvent event) {
 
                 pluckit.PrepArea newPA = new pluckit.PrepArea();
                     String exportAddress;
-
+                    Stage chooser = new Stage();
+                    FileChooser fileChooser = new FileChooser();
+                    fileChooser.setTitle("Export Location");
+                    FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("Word Document (*.docx)", "*.docx");
+                    fileChooser.getExtensionFilters().add(filter);
+                    File file = fileChooser.showSaveDialog(chooser);
+                    
                     try {
 
-                        exportAddress = "C:\\Users\\MorganWillis\\Documents\\NetBeansProjects\\TextFiles\\textPic";
+                        exportAddress = file.toString();
                         newPA.exportToWord(exportAddress, tab.getImages());
                     } catch (Exception ex) {
                         Logger.getLogger(Pluckit.class.getName()).log(Level.SEVERE, null, ex);
@@ -342,9 +396,19 @@ public class Pluckit extends Application {
 
             ));
         
-        
+            exit.setOnAction ( 
+                (new EventHandler<ActionEvent>() {
+            @Override
+                public void handle
+                (ActionEvent event) {
+                    theStage.close();
+                }
+            }
+
+            ));
+            
             file.getItems().addAll(save, load, export, exit);
-            tools.getItems().addAll(loadChord);
+            tools.getItems().addAll(loadChord,newChord);
         /**
          * *************************************************
          */
@@ -377,4 +441,9 @@ public class Pluckit extends Application {
         launch(args);
     }
 
+    private void setStage(Stage primaryStage) {
+        theStage = primaryStage;
+    }
+    
+    
 }

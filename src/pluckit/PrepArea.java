@@ -52,83 +52,151 @@ import org.xml.sax.SAXException;
  * @author MorganWillis
  */
 public class PrepArea {
-    
-    String Name;
-    ArrayList<Chord> song;
-    private static WordprocessingMLPackage wordMLPackage;
-    private static ObjectFactory factory;
+    String Name; // hold the name of the song
+    ArrayList<Chord> song; // Hold all the chords in the song
+    private static WordprocessingMLPackage wordMLPackage; // allow the user to export
+    private static ObjectFactory factory; // used to create objects
 
+    /**
+     * Set the name of the song
+     * @param newName 
+     */
     public void setName(String newName) {
         Name = newName;
     }
 
+    /**
+     * Return the name of the song
+     * @return 
+     */
     public String getName() {
         return Name;
     }
 
+    /**
+     * Set the song list
+     * @param newSong 
+     */
     public void setSong(ArrayList<Chord> newSong) {
         song = newSong;
     }
 
+    /**
+     * Return the song list
+     * @return 
+     */
     public ArrayList<Chord> getSong() {
         return song;
     }
 
+    /**
+     * Add a chord to the song
+     * @param newChord 
+     */
     public void addChord(Chord newChord) {
         song.add(newChord);
     }
 
+    /** 
+     * Remove a chord from the song
+     * @param i 
+     */
     public void removeChord(int i) {
         song.remove(i);
     }
 
+    /**
+     * export the song to word to allow for lyric editing and printing
+     * @param address
+     * @param pic
+     * @throws AWTException
+     * @throws IOException
+     * @throws InvalidFormatException
+     * @throws Docx4JException
+     * @throws Exception 
+     */
     public void exportToWord(String address, ArrayList<WritableImage> pic) throws AWTException, IOException, InvalidFormatException, Docx4JException, Exception {
 
-        String exportAddress;
-
+        // Create the package to allow for exporting
         wordMLPackage = WordprocessingMLPackage.createPackage();
         
+        // Create the factory
         factory = Context.getWmlObjectFactory();
         
+        // Create the table and its elements
         Tbl table = factory.createTbl();
         Tr tr = factory.createTr();
         Tr trU = factory.createTr();
+        
+        // Create folder for the pictures to be put in
+        boolean success = new File("C:\\PluckIt").mkdir();
+        String picAddress = "C:\\PluckIt\\pic.png";
+        success = new File("C:\\PluckIt").exists();
+        
+        // Make sure the folder exists
+       
+        if(success)
+        {
+            // Copy all the pictures and insert them into the word document
+            for (int i = 0; i < pic.size(); i++) {
+                
+                // Create the file for the pictures
+                File file = new File(picAddress);
+                
+                // Create a temp picture too allow for adjusted settings
+                WritableImage temp = pic.get(i);
+                ImageView newView = new ImageView(temp);
+                
+                // Adjust the size
+                newView.setFitHeight(200);
+                newView.setFitWidth(100);
+                
+                // Save the image
+                RenderedImage renderedImage = SwingFXUtils.fromFXImage(newView.snapshot(null, null), null);
+                ImageIO.write(renderedImage, "png", file);
+                System.out.println("Image created and saved");
 
-        for (int i = 0; i < pic.size(); i++) {
-            exportAddress = address + i + ".png";
-            WritableImage temp = pic.get(i);
-            ImageView newView = new ImageView(temp);
-            newView.setFitHeight(200);
-            newView.setFitWidth(100);
-            RenderedImage renderedImage = SwingFXUtils.fromFXImage(newView.snapshot(null, null), null);
-            ImageIO.write(renderedImage, "png", new File(exportAddress));
-            System.out.println("Image created and saved");
+                // Create cell contents
+                P paragraphWithImage = addInlineImageToParagraph(createInlineImage(file));
+                P paragraphOfText = wordMLPackage.getMainDocumentPart().createParagraphOfText("");
 
-            File file = new File(exportAddress);
-            P paragraphWithImage = addInlineImageToParagraph(createInlineImage(file));
-            P paragraphOfText = wordMLPackage.getMainDocumentPart().createParagraphOfText("");
+              
+                // Add contents to the table
+                  addTableCell(tr, paragraphWithImage);
+                  addTableCell(trU, paragraphOfText);
 
-            addTableCell(tr, paragraphWithImage);
-            addTableCell(trU, paragraphOfText);
-            
-            if (i % 5 == 4 || (i + 1) > pic.size())
-            {
-                table.getContent().add(tr);
-                table.getContent().add(trU);
-                tr = factory.createTr();
-                trU = factory.createTr();
+                // Create a new row after we reach the end of the document
+                if (i % 5 == 4 || i+1 == pic.size())
+                {
+                    table.getContent().add(tr);
+                    table.getContent().add(trU);
+                    
+                    // Reset the rows in order to add more data
+                    tr = factory.createTr();
+                    trU = factory.createTr();
 
+                }
+                
+              
+                
+                // Delete current picture to save space 
+                file.delete();
             }
         }
 
-
+        // Create the word document and save it
         wordMLPackage.getMainDocumentPart().addObject(table);
-        wordMLPackage.save(new java.io.File("C:\\Users\\MorganWillis\\Documents\\NetBeansProjects\\TextFiles\\textPic.docx"));
+        wordMLPackage.save(new java.io.File(address));
         
-        Desktop.getDesktop().open(new File("C:\\Users\\MorganWillis\\Documents\\NetBeansProjects\\TextFiles\\textPic.docx"));
+        // Open the file for the users use
+        Desktop.getDesktop().open(new File(address));
         System.out.println("Successful Save");
     }
 
+    /** 
+     * Save a song in an xml format
+     * @param address 
+     */
     public void saveSong(String address) {
         try {
 
@@ -174,6 +242,13 @@ public class PrepArea {
         }
     }
 
+    /**
+     * load a song from an xml format
+     * @param address
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException 
+     */
     public void loadSong(String address) throws ParserConfigurationException, SAXException, IOException {
 
         song = new ArrayList<Chord>();
@@ -212,6 +287,10 @@ public class PrepArea {
         }
     }
 
+    /**
+     * Create a new chord for the song.
+     * @param elem 
+     */
     private void newSongChord(Element elem) {
 
         // Get all the nodes of the described type
@@ -237,6 +316,9 @@ public class PrepArea {
 
     }
 
+    /**
+     * Display the song to the user
+     */
     public void display() {
         for (Chord song1 : song) {
             System.out.println(song1.display());

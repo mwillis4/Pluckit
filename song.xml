@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<song>
+  <Chord Name="E"> 022100 </Chord>
+  <Chord Name="Em"> 022000 </Chord>
+  <Chord Name="E7"> 020100 </Chord>
+  <Chord Name="B7"> 021202 </Chord>
+  <Chord Name="A"> 002220 </Chord>
+  <Chord Name="A7"> 002020 </Chord>
+  <Chord Name="Am"> 002210 </Chord>
+  <Chord Name="Am7"> 002100 </Chord>
+  <Chord Name="AM7"> 002120 </Chord>
+  <Chord Name="D"> 000232 </Chord>
+  <Chord Name="D7"> 000212 </Chord>
+  <Chord Name="Dm"> 000231 </Chord>
+  <Chord Name="Dm7"> 000211 </Chord>
+  <Chord Name="DM7"> 000222 </Chord>
+  <Chord Name="C"> 032010 </Chord>
+  <Chord Name="C7"> 032310 </Chord>
+  <Chord Name="CM7"> 032000 </Chord>
+  <Chord Name="G"> 210003 </Chord>
+  <Chord Name="WORKING"> 320001 </Chord>
+</song>
