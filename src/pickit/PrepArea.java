@@ -51,6 +51,7 @@ import org.docx4j.wml.TblBorders;
 import org.docx4j.wml.TblPr;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.Tr;
+import pluckit.Chord;
 
 //import javax.xml.bind.JAXBException;
 
